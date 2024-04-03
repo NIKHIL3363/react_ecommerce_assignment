@@ -3,17 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { decrementupdate, deleteCartItem, incrementupdate, updatecartitem, updatecartitem1 } from '../storedata';
 import { updateproduct } from '../productslice';
-
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faIndianRupee } from '@fortawesome/free-solid-svg-icons';
 
 export default function Cart() {
   const cart = useSelector((state) => state.cart.carts)
-  const [cartcopy,setcopy]=useState(cart)
+  const [cartcopy, setcopy] = useState(cart)
   const [total, settotal] = useState(0)
   const [change, setchange] = useState(true)
   const [finalbill, setbill] = useState(0);
   const [cheseamount, setcheeseamount] = useState()
-  const [ableapplebtn,setit]=useState(false)
+  const [breadAmount,setbreadAmount]=useState(0)
+  const [isapply, setit] = useState(false)
+  const icon = <FontAwesomeIcon icon={faIndianRupee} />
+  const [butterAmount,setbutterAmount]=useState(0)
 
 
   //const[change2,setchange2]=useState(true)
@@ -73,23 +76,20 @@ export default function Cart() {
 
 
   }, [change])
-  useEffect(()=>{
+  useEffect(() => {
 
 
-    console.log('inside 2nd useffec don')
 
-   const as= cart.filter((item)=>item.name==='Cheese'||item.name==="Soup"||item.name==='Bread'||item.name==='Butter')
+    const as = cart.filter((item) => item.name === 'Cheese' || item.name === "Soup" || item.name === 'Bread' || item.name === 'Butter')
 
-  if(as.length>0)
-  {
+    if (as.length > 0) {
 
 
-    setit(false)
-  }
-  else
-  {setit(true)}
+      setit(false)
+    }
+    else { setit(true) }
 
-  },[])
+  }, [])
 
 
 
@@ -101,18 +101,15 @@ export default function Cart() {
     let finalamount = 0
 
     cart.map((item) => {
-      if (item.name === 'Cheese') 
-      {
-        if (item.quantity > 1) 
-        {
+      if (item.name === 'Cheese') {
+        if (item.quantity > 1) {
 
 
           finalamount += item.price * item.quantity / 2
           setcheeseamount(item.price * item.quantity / 2)
           dispatch(updatecartitem(item.id))
         }
-        else
-        {
+        else {
 
           finalamount += item.price * item.quantity
           dispatch(updatecartitem(item.id))
@@ -122,24 +119,24 @@ export default function Cart() {
 
 
       }
-      else if (item.name === "Soup") 
-      {
+      else if (item.name === "Soup") {
         console.log('inside soup')
 
         finalamount += item.price * item.quantity
-        
+
       }
-      else if (item.name === 'Bread') 
-      { const checker = cartcopy.some((item)=>
-        item.name ==='Soup')
-         console.log(checker)
-         if(checker)
-         {finalamount += item.price / 2 * item.quantity
+      else if (item.name === 'Bread') {
+        const checker = cartcopy.some((item) =>
+          item.name === 'Soup')
+        console.log(checker)
+        if (checker) {
+          finalamount += item.price / 2 * item.quantity
+          setbreadAmount(item.price/2 * item.quantity)
           dispatch(updatecartitem1('Bread'))
-         }
-        else
-        {finalamount+=item.price*item.quantity
-          
+        }
+        else {
+          finalamount += item.price * item.quantity
+
         }
 
 
@@ -147,8 +144,7 @@ export default function Cart() {
 
       }
 
-      else if (item.name === 'Butter') 
-      {
+      else if (item.name === 'Butter') {
 
 
 
@@ -156,15 +152,17 @@ export default function Cart() {
 
 
 
-        if (item.quantity > 2) 
-        {
+        if (item.quantity > 2) {
 
 
 
-          finalamount += item.price * item.quantity - item.price
+          finalamount +=  item.quantity/3 * item.price*2
+
+          setbutterAmount(item.quantity/3 *item.price)
+          
+
         }
-        else 
-        {
+        else {
 
           finalamount += item.price * item.quantity
 
@@ -174,9 +172,8 @@ export default function Cart() {
 
 
       }
-      else 
-      {
-           console.log(finalamount)
+      else {
+        console.log(finalamount)
         finalamount += item.price * item.quantity
       }
 
@@ -187,18 +184,38 @@ export default function Cart() {
     })
 
   }
-  const gun=()=>{
+  const gun = () => {
 
-    navigate('/checkout',{state:{finalbill,total}});
-    
-    // navigate(`/checkout/${finalbill}/${total}`) 
-    
+    navigate('/checkout', { state: { finalbill, total } });
+
+
+  }
+
+  const calculatesaving = (item) => {
+
+
+    if (item.name === 'Cheese') {
+      return cheseamount
+    }
+    else if(item.name==='Bread')
+    {
+
+      return breadAmount
+    }
+    else if(item.name==='Butter'){
+
+      return butterAmount
+    }
+    else{
+      return 0
+    }
+
   }
 
 
-return (
-      
-      <div className="container mx-auto">
+  return (
+
+    <div className="container mx-auto">
       <h1 className="text-3xl font-semibold mb-4">Shopping Cart</h1>
       {cart.length === 0 ? (
         <p>Your cart is empty. <Link to="/Products">Shop now</Link>.</p>
@@ -207,14 +224,16 @@ return (
           {cart.map((item) => (
 
 
-            <div key={item.id} className="flex items-center justify-between bg-blue-700 p-4 mb-4 rounded shadow">
+            <div key={item.id} className="flex items-center justify-between bg-slate-500 p-4 mb-4 rounded shadow">
               <div className="flex items-center">
                 <img className="w-16 h-16 mr-4" src={item.image} alt={item.name} />
                 <div>
                   <h2 className="text-lg font-semibold">{item.name}</h2>
 
-                  <p className="text-black font-medium">Rs-{item.price}</p>
-                  <p className='text-red-700 text-xl font-semibold '>{item.offermessage || null}</p>
+                  <p className="text-black">Price {icon} {item.price}</p>
+                  <p className='text-black'>Item-Cost:{item.price}*{item.quantity}={icon}{item.price * item.quantity}</p>
+                  <p className='text-red-700 text-xl '>{item.offermessage || null}</p>
+                  <p className='text-red-700'>saved:{icon}{calculatesaving(item)}</p>
 
                 </div>
 
@@ -254,24 +273,23 @@ return (
               </ul>
             </div>
             {
-              <button disabled={ableapplebtn} onClick={() => applyOffer()} className={`px-4 py-2 rounded-md ${
-                ableapplebtn ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
-              }`}>
+              <button disabled={isapply} onClick={() => applyOffer()} className={`px-4 py-2 rounded-md ${isapply ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}>
                 Apply Offer
               </button>
             }
           </div>
           <div className="flex justify-between">
-            
-            
-            <h2 className="text-xl font-semibold">total:Rs:{total||0}
+
+
+            <h2 className="text-xl text-green-600">Total:{icon}{total || 0}
             </h2>
-            <h2 className="text-xl font-semibold">totalAfterOfferApplied:Rs:{finalbill || 0}
+            <h2 className="text-xl  text-violet-500 font-semibold">totalAfterOfferApplied:{icon}{finalbill || 0}
             </h2>
 
 
 
-                
+
 
 
 
@@ -289,9 +307,9 @@ return (
 
       )}
 
-     
+
     </div>
-)   
+  )
 
 }
 
