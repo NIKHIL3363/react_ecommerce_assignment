@@ -13,11 +13,11 @@ const location=useLocation()
  
     return (
       <div className="flex flex-col items-center justify-center p-8">
-      <h2 className="text-2xl font-bold mb-4">Checkout Page</h2>
-      <p className='text-blue-300'>SubTotal:{icon}{total}</p>
+      <h1 className="text-gray-500 text-2xl font-bold mb-4">Checkout Page</h1>
+      <p className='text-blue-500'>SubTotal:{icon}{total}</p>
 
-      <p className='text-blue-400'>Final Bill:{icon}{finalbill} </p>
-      <p className='text-blue-500'>Saved Amount:{icon}{total-finalbill}</p>
+      <p className='text-blue-500'>Final Bill:{icon}{finalbill} </p>
+      <p className='text-blue-700'>Saved Amount:{icon}{total-finalbill}</p>
       
       <div className='mt-6 text-cyan-500 text-3xl font-extrabold'> 
       {icon}{finalbill}
